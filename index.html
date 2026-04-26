@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ESPORA | Red de Supervivencia</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <div class="logo">ESPORA</div>
+        <div style="text-align: right;">
+            <div id="own-id" style="font-size: 0.7rem; font-weight: 800; color: var(--accent-color);">ID: SP-742</div>
+            <div id="mesh-status" style="font-size: 0.6rem; color: var(--node-active);">MESH ACTIVO</div>
+        </div>
+    </header>
+
+    <main id="app-container">
+        <!-- Dashboard Principal -->
+        <section id="dashboard" class="view">
+            <div class="radar-container">
+                <div class="radar-sweep"></div>
+                <!-- Nodos se inyectarán aquí -->
+                <div class="node" style="top: 30%; left: 70%;"></div>
+                <div class="node" style="top: 60%; left: 20%;"></div>
+            </div>
+
+            <div style="text-align: center; margin-top: -20px;">
+                <h2 id="node-count">2 NODOS CERCA</h2>
+                <p style="color: var(--text-secondary); font-size: 0.8rem;">RADIO: 200m (BT / WI-FI DIRECT)</p>
+            </div>
+
+            <button class="btn-emergency" onclick="toggleSeedMode()">
+                <span class="nav-icon">🌱</span> SEMBRAR APP
+            </button>
+
+            <div class="feed">
+                <div class="feed-header">Últimas Alertas (Malla)</div>
+                <div id="messages-container">
+                    <div class="message">
+                        <span class="time">HACE 2 MIN</span>
+                        ESTADO: Nodo Médico A activo a 400m.
+                    </div>
+                    <div class="message">
+                        <span class="time">HACE 10 MIN</span>
+                        ALERTA: Suministro agua bloqueado Sector 4.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vista de Chat (Mensajería Ultra-Ligera) -->
+        <section id="messages-view" class="view" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="feed-header">CANAL LOCAL (MALLA)</div>
+                <select id="recipient-select" style="background: #1C1C1E; color: var(--accent-color); border: none; font-size: 0.7rem; padding: 4px; border-radius: 8px; outline: none;">
+                    <option value="PUBLICO">📢 PÚBLICO</option>
+                    <option value="SP-001">👤 NODO SP-001</option>
+                    <option value="SP-002">👤 NODO SP-002</option>
+                </select>
+            </div>
+            
+            <div id="chat-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+                <!-- Mensajes inyectados aquí -->
+                <div class="message">
+                    <span class="time">SISTEMA</span>
+                    Bienvenido a la malla ESPORA. Todo mensaje se comprime al máximo.
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Escribe un mensaje...">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                    <button class="btn-secondary" onclick="sendMessage('text')">TXT</button>
+                    <button class="btn-secondary" onclick="sendMessage('audio')">REC</button>
+                    <button class="btn-secondary" onclick="sendMessage('image')">PIC</button>
+                </div>
+            </div>
+            
+            <button class="btn-secondary" onclick="showView('dashboard')" style="width: 100%; margin-top: 10px;">
+                VOLVER AL RADAR
+            </button>
+        </section>
+
+        <!-- Vista de Baliza de Rescate (GPS Comprimido) -->
+        <section id="gps-view" class="view" style="display: none; flex-direction: column; align-items: center; text-align: center;">
+            <div class="feed-header" style="width: 100%;">BALIZA DE RESCATE</div>
+            
+            <div style="margin: 30px 0;">
+                <div style="font-size: 3rem; font-weight: 900; color: var(--accent-color);" id="coords-display">--.---- , --.----</div>
+                <p style="color: var(--text-secondary);">COORDENADAS COMPRIMIDAS (8 BYTES)</p>
+            </div>
+
+            <div class="radar-container" style="margin-bottom: 20px;">
+                <div id="compass-arrow"></div>
+                <p style="position: absolute; bottom: -30px; font-size: 0.7rem; width: 100%;">NORTE RELATIVO</p>
+            </div>
+
+            <div class="feed" style="width: 100%; text-align: left;">
+                <div class="feed-header">Nodos de Referencia</div>
+                <div id="reference-nodes">
+                    <p style="font-size: 0.9rem;">📍 A 200m de <strong>NODO MÉDICO A</strong></p>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">📍 A 450m de <strong>PUNTO SEMILLA ALPHA</strong></p>
+                </div>
+            </div>
+
+            <button class="btn-emergency" style="width: 100%; margin-top: 20px; background-color: var(--alert-color); color: white;" onclick="sendSOS()">
+                🚨 ENVIAR S.O.S. (12 bytes)
+            </button>
+        </section>
+
+        <!-- Vista de Billetera (Economía de Malla) -->
+        <section id="wallet-view" class="view" style="display: none; flex-direction: column; gap: 20px;">
+            <div class="feed-header">BILLETERA DE MALLA</div>
+            
+            <!-- Tarjeta de Saldo -->
+            <div style="background: linear-gradient(135deg, #1C1C1E, #050505); padding: 30px; border-radius: 24px; border: 1px solid rgba(255,107,0,0.2); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <p style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 2px;">Saldo Disponible</p>
+                <div style="font-size: 3.5rem; font-weight: 900; color: var(--text-primary);"><span id="balance-amount">500</span> <span style="color: var(--accent-color); font-size: 1.5rem;">ESP</span></div>
+                <p style="color: var(--node-active); font-size: 0.7rem; margin-top: 8px;">✓ LIBRO DE CONTABILIDAD SINCRONIZADO</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <button class="btn-emergency" onclick="simulateTransaction('send')" style="background: #FFFFFF; color: black;">
+                    <span>📤</span> PAGAR
+                </button>
+                <button class="btn-emergency" onclick="simulateTransaction('receive')">
+                    <span>📥</span> RECIBIR
+                </button>
+            </div>
+
+            <div class="feed" style="flex: 1; overflow-y: auto;">
+                <div class="feed-header">Historial de Transacciones</div>
+                <div id="transaction-history" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Transacciones inyectadas aquí -->
+                    <div class="message" style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,255,65,0.05);">
+                        <div>
+                            <span class="time">HACE 1 HORA | DESDE: SP-001</span>
+                            Recompensa por Relevo de Red
+                        </div>
+                        <span style="color: var(--node-active); font-weight: 800;">+50 ESP</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vista Semilla (Clonación) -->
+        <section id="seed-view" class="view" style="display: none;">
+            <h2 style="color: var(--accent-color);">MODO SEMILLA</h2>
+            <p>Tu teléfono está creando un hotspot para clonar la app.</p>
+            
+            <div style="background: white; padding: 20px; margin: 20px 0; border-radius: 12px; display: inline-block;">
+                <!-- QR Placeholder -->
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ESPORA_HOTSPOT" alt="QR Code">
+            </div>
+            
+            <div class="feed" style="text-align: left;">
+                <p><strong>Paso 1:</strong> Dile al otro usuario que se conecte a "ESPORA_FREE".</p>
+                <p><strong>Paso 2:</strong> Pide que abra 192.168.43.1 en su navegador.</p>
+                <p><strong>Paso 3:</strong> Descargar e instalar APK.</p>
+            </div>
+
+            <button class="btn-secondary" onclick="toggleSeedMode()" style="width: 100%; margin-top: 20px;">
+                VOLVER AL DASHBOARD
+            </button>
+        </section>
+    </main>
+
+    <footer>
+        <div class="nav-item active" onclick="showView('dashboard')">
+            <span class="nav-icon">📡</span>
+            <span>MALLA</span>
+        </div>
+        <div class="nav-item" onclick="showView('messages-view')">
+            <span class="nav-icon">💬</span>
+            <span>CHAT</span>
+        </div>
+        <div class="nav-item" onclick="showView('gps-view')">
+            <span class="nav-icon">📍</span>
+            <span>BALIZA</span>
+        </div>
+        <div id="wallet-nav" class="nav-item" onclick="showView('wallet-view')" style="display: none;">
+            <span class="nav-icon">🪙</span>
+            <span>ECONOMÍA</span>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
