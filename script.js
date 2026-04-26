@@ -58,14 +58,14 @@ function sendMessage(type) {
     }
     
     const recipient = document.getElementById('recipient-select').value;
-    const content = input.value || (type === 'text' ? "Alerta de prueba" : `Archivo ${type}`);
+    const msgContent = content || (type === 'text' ? "Alerta de prueba" : `Archivo ${type}`);
     
     // Pilar 3: Proof of Work (PoW) - Simulación de validación
     input.disabled = true;
     input.placeholder = "VERIFICANDO PAQUETE (PoW)...";
     
     setTimeout(() => {
-        const payload = recipient !== 'PUBLICO' ? encryptSim(content) : content;
+        const payload = recipient !== 'PUBLICO' ? encryptSim(msgContent) : msgContent;
 
         const msg = {
             id: Date.now(),
@@ -73,8 +73,8 @@ function sendMessage(type) {
             recipient: recipient,
             type: type,
             content: payload,
-            original: content,
-            size: calculateSize(type, content),
+            original: msgContent,
+            size: calculateSize(type, msgContent),
             timestamp: new Date().toLocaleTimeString(),
             trust: 'VERIFICADO', // Pilar 3
             status: state.nodes.length > 0 ? 'ENTREGADO' : 'PENDIENTE'
