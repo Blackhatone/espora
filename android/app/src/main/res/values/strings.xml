@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ESPORA</string>
+    <string name="title_activity_main">ESPORA</string>
+    <string name="package_name">com.blackhatone.espora</string>
+    <string name="custom_url_scheme">com.blackhatone.espora</string>
+</resources>
