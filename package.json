@@ -5,7 +5,7 @@
   "main": "script.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "mkdir -p www && cp -r index.html script.js style.css assets www/"
+    "build": "mkdir -p www && cp -r index.html script.js style.css www/ && (cp -r assets www/ 2>/dev/null || mkdir -p www/assets)"
   },
   "repository": {
     "type": "git",
